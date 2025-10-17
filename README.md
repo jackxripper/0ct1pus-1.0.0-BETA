@@ -1,203 +1,112 @@
-# 0ct1pus-1.0.0-BETA
+# InstaShell
 
-A short one-line summary: what this project does (replace this line with a concise description).
+## Description
 
-Status: BETA — this release is an early / pre-production build. Use with caution and expect breaking changes.
+A bash-based Instagram brute force tool that attempts password attacks using wordlists through TOR network routing.
 
----
+## Author
 
-Table of Contents
-- [About](#about)
-- [Features](#features)
-- [Language composition](#language-composition)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Quick start](#quick-start)
-- [Configuration](#configuration)
-- [Usage Examples](#usage-examples)
-- [Development](#development)
-- [Testing](#testing)
-- [Contributing](#contributing)
-- [License](#license)
-- [Maintainers & Contact](#maintainers--contact)
+Work done by jackxripper
 
----
+## Requirements
 
-## About
-0ct1pus is a [brief description — replace me] designed to [explain primary goal: e.g., "provide fast image analysis", "orchestrate containers", "act as a CLI for X", etc.]. This repository holds version 1.0.0 BETA.
-
-If you are reading this and want the README tailored precisely to the code in this repository, please either:
-- give me access to the repository contents so I can auto-generate exact commands and examples, or
-- paste the main files (package manifest, build scripts, entrypoint files) and I will update this README with exact steps.
+- Root access
+- TOR service running
+- Required dependencies:
+  - openssl
+  - tor
+  - curl
+  - awk
+  - sed
+  - cat
+  - tr
+  - wc
+  - cut
+  - uniq
+  - /dev/urandom
 
 ## Features
-- Feature 1 — short description
-- Feature 2 — short description
-- Feature 3 — short description  
-(Replace or extend with real features from the project.)
 
-## Language composition
-(Replace this section with actual repo language breakdown.)
-- Primary language: [e.g., JavaScript / TypeScript / Python / Go / Rust / Java / etc.]
-- Other languages: [list]
-
-## Prerequisites
-List the things users need before installing or building:
-- OS: Linux / macOS / Windows (specify)
-- Runtime(s): Node >= X, Python >= X, Go >= X, Rust toolchain, Docker, etc. (replace)
-- Tools: git, make, docker, or package manager (npm, pip, cargo) as applicable
+- Multi-threaded password attempts (configurable threads, recommended < 20)
+- TOR network integration for anonymized requests
+- Session save/resume functionality
+- Automatic IP rotation via TOR circuit changes
+- Device ID and GUID spoofing
+- Instagram API authentication emulation
+- Password wordlist support
 
 ## Installation
-Clone the repository:
+
+1. Ensure all dependencies are installed
+2. Start TOR service:
+   ```bash
+   tor
+   # or
+   service tor start
+   ```
+3. Make the script executable:
+   ```bash
+   chmod +x instashell.sh
+   ```
+
+## Usage
+
+### Basic Attack
 ```bash
-git clone https://github.com/jackxripper/0ct1pus-1.0.0-BETA.git
-cd 0ct1pus-1.0.0-BETA
+sudo ./instashell.sh
 ```
 
-Install dependencies (example variations — pick the one that matches the project):
-- Node (npm / yarn):
-```bash
-# npm
-npm install
+You will be prompted for:
+- Target Instagram username
+- Password list file (default: `passwords.lst`)
+- Number of threads (default: 10)
 
-# or yarn
-yarn install
+### Resume Session
+```bash
+sudo ./instashell.sh --resume
 ```
 
-- Python (pip / venv):
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
+## How It Works
 
-- Go:
-```bash
-go mod download
-go build ./...
-```
+1. **Initialization**: Generates random device identifiers (UUID, GUID, phone ID, device ID)
+2. **Account Validation**: Checks if the target username exists
+3. **TOR Connection**: Verifies TOR is running and accessible
+4. **Brute Force Loop**:
+   - Reads passwords from wordlist in batches
+   - Creates authenticated requests with HMAC-SHA256 signatures
+   - Routes requests through TOR (127.0.0.1:9050)
+   - Monitors for success responses (200, challenge)
+   - Rotates IP on rate limiting
+5. **Result Storage**: Saves found passwords to `found.passwords`
 
-- Rust:
-```bash
-cargo build --release
-```
+## Session Management
 
-- Docker:
-```bash
-# build
-docker build -t 0ct1pus:beta .
+- Press `Ctrl+C` to stop and optionally save session
+- Sessions stored in `sessions/` directory
+- Resume saved sessions with `--resume` flag
 
-# run
-docker run --rm -it 0ct1pus:beta
-```
+## Output
 
-Adjust the commands above to fit the project's actual language and tooling.
+- Real-time password attempt display
+- Success indicators for found passwords
+- Results saved to `found.passwords` file
 
-## Quick start
-Run the app locally (example placeholders — replace with the real command):
-```bash
-# If it's a CLI
-./bin/0ct1pus --help
+## Technical Details
 
-# If it's a server
-npm start
-# or
-python -m 0ct1pus
-# or
-./0ct1pus --port 8080
-```
+- Uses Instagram API endpoint: `https://i.instagram.com/api/v1/accounts/login/`
+- Spoofs Android device (Instagram 10.26.0 Android)
+- Implements HMAC-SHA256 request signing
+- SOCKS5 proxy through TOR (localhost:9050)
+- Automatic IP rotation on rate limit detection
 
-Open http://localhost:8080 (if it's a web service).
+## Signals
 
-## Configuration
-Configuration can be provided via:
-- Environment variables
-- config.yml / config.json
-- CLI flags
+- `SIGINT` (Ctrl+C): Triggers session save prompt
+- `SIGHUP`: Reloads TOR for new circuit
 
-Common placeholders:
-- PORT — port to bind the service (default: 8080)
-- DATABASE_URL — connection string for a database
-- API_KEY — API key for external services
+## Notes
 
-Document the real keys and defaults here once you confirm the project's configuration approach.
-
-## Usage Examples
-Describe real commands or API examples that demonstrate typical usage. Example CLI:
-```bash
-# example: process a file
-./0ct1pus process input.jpg --output out.jpg
-```
-
-Example HTTP request (if applicable):
-```bash
-curl -X POST "http://localhost:8080/api/v1/analyze" \
-  -H "Authorization: Bearer $API_KEY" \
-  -F "file=@/path/to/file.jpg"
-```
-
-Replace the above with exact endpoints, flags, and examples from the repo.
-
-## Development
-Contributing code locally:
-```bash
-# create a branch
-git checkout -b feat/some-feature
-
-# run formatting / linters
-npm run lint
-npm run format
-
-# run tests
-npm test
-
-# open a pull request
-git push origin feat/some-feature
-```
-
-Include any project-specific pre-commit hooks or code generation steps here.
-
-## Testing
-Describe how to run the test suite:
-```bash
-# run tests
-npm test
-# or
-pytest
-# or
-go test ./...
-```
-
-If tests require services (databases, redis), document how to start them (docker-compose, test containers).
-
-## Contributing
-We welcome contributions! Please:
-1. Fork the repo
-2. Create a descriptive branch name
-3. Open a PR with a clear description and tests
-4. Follow the code style and run linters/tests locally
-
-Add any contributing guidelines, code of conduct links, or issue templates if present in the repo.
-
-## License
-Specify the license used by the project (e.g., MIT, Apache-2.0). If you haven't chosen one yet, add a LICENSE file and update this section.
-
-Example:
-This project is licensed under the MIT License — see the LICENSE file for details.
-
-## Maintainers & Contact
-- Maintainer: jackxripper (https://github.com/jackxripper)
-- For issues or feature requests, please use GitHub Issues: https://github.com/jackxripper/0ct1pus-1.0.0-BETA/issues
-
-## Acknowledgements
-Credit any libraries, inspirations, or contributors.
-
----
-
-Notes for me / how this README was generated
-- This README is a draft scaffold. I don't currently have access to your repository files, so many commands, examples, and configuration keys are placeholders.
-- If you want a fully accurate README I can:
-  - fetch the repo and auto-populate exact install/build/run instructions and language breakdown, then open a PR with the README; or
-  - you can paste the project's package manifest (package.json / pyproject.toml / go.mod / Cargo.toml) and the main entrypoint(s), and I'll update the README accordingly.
-
-Tell me how you'd like to proceed and I will update or push the README for you.
+- Requires root privileges to run
+- Default thread count is 10 (keep under 20 for stability)
+- Automatic IP rotation helps avoid rate limiting
+- Sessions include user, last attempted password, and wordlist path

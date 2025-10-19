@@ -1,5 +1,3 @@
-# InstaShell
-
 ## Description
 
 A bash-based Instagram brute force tool that attempts password attacks using wordlists through TOR network routing.

@@ -44,14 +44,14 @@ Work done by jackxripper
    ```
 3. Make the script executable:
    ```bash
-   chmod +x instashell.sh
+   chmod +x instas.sh
    ```
 
 ## Usage
 
 ### Basic Attack
 ```bash
-sudo ./instashell.sh
+sudo ./instas.sh
 ```
 
 You will be prompted for:
@@ -61,7 +61,7 @@ You will be prompted for:
 
 ### Resume Session
 ```bash
-sudo ./instashell.sh --resume
+sudo ./instas.sh --resume
 ```
 
 ## How It Works
